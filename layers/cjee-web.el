@@ -21,13 +21,6 @@
 ;; 格式化快捷键
 (global-set-key (kbd "C-M-\\") 'format-with-prettier)
 
-;; 优先读取node_modules的path
-(use-package add-node-modules-path
-  :ensure t
-  :config
-  ;; automatically run the function when web-mode starts
-  (eval-after-load 'web-mode
-    '(add-hook 'web-mode-hook 'add-node-modules-path)))
 
 (use-package css-mode
   :ensure t
