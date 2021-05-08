@@ -38,25 +38,20 @@ This function should only modify configuration layer settings."
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
      ;; `M-m f e R' (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     auto-completion
      better-defaults
      emacs-lisp
      git
      ivy
-     ;;lsp                                
+     tide
      html
+     lsp
      markdown
      emoji
-     (javascript :variables javascript-backend 'lsp)
-     (typescript :variables
-                 typescript-fmt-on-save nil
-                 typescript-fmt-tool 'typescript-formatter
-                 typescript-backend 'lsp)
      multiple-cursors
       org
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
+      (shell :variables
+             shell-default-height 30
+             shell-default-position 'bottom)
      ;; spell-checking
       syntax-checking
       chinese
@@ -72,14 +67,14 @@ This function should only modify configuration layer settings."
    ;; `dotspacemacs/user-config'. To use a local version of a package, use the
    ;; `:location' property: '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
-   dotspacemacs-additional-packages '(doom-themes pyim cnfonts org-download  ivy-posframe )
+   dotspacemacs-additional-packages '(doom-themes pyim cnfonts org-download  ivy-posframe company-tabnine company-posframe)
    
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
 
    ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages '(org-projectile org-brain magit-gh-pulls magit-gitflow  evil-mc realgud tern company-tern
+   dotspacemacs-excluded-packages '(org-projectile org-brain magit-gh-pulls magit-gitflow  evil-mc realgud
                     evil-args evil-ediff evil-exchange evil-unimpaired
                     evil-indent-plus volatile-highlights smartparens
                     holy-mode skewer-mode rainbow-delimiters
@@ -93,7 +88,7 @@ This function should only modify configuration layer settings."
                     helm-flyspell flyspell-correct-helm clean-aindent-mode
                     helm-c-yasnippet ace-jump-helm-line helm-make magithub
                     helm-themes helm-swoop helm-spacemacs-help smeargle
-                    ido-vertical-mode flx-ido company-quickhelp ivy-rich helm-purpose )
+                    ido-vertical-mode flx-ido ivy-rich helm-purpose )
 
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
@@ -515,11 +510,10 @@ See the header of this file for more information."
   (spacemacs/load-spacemacs-env))
 
 (defun dotspacemacs/user-init ()
-
-(setq configuration-layer-elpa-archives
-    '(("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-      ("org-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
-      ("gnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")))
+  (setq configuration-layer-elpa-archives
+        '(("melpa-cn" . "http://elpa.emacs-china.org/melpa/")
+          ("org-cn"   . "http://elpa.emacs-china.org/org/")
+          ("gnu-cn"   . "http://elpa.emacs-china.org/gnu/")))
   "Initialization for user code:
 This function is called immediately after `dotspacemacs/init', before layer
 configuration.
@@ -535,17 +529,24 @@ dump."
   )
 
 (defun dotspacemacs/user-config ()
+(require 'loadhist)
+(file-dependents (feature-file 'cl))
   ;; pyim 配置
   (require 'cjee-pyim)
   (require 'cjee-org)
-  (require 'cjee-web)
   (require 'cjee-prettier)
+  (require 'cjee-company)
   (require 'cjee-buffer)
+  (require 'cjee-lsp)
+  (require 'cjee-flycheck)
+  (require 'cjee-js)
+  (require 'cjee-css)
   (require 'cnfonts)
   ;; 让 cnfonts 随着 Emacs 自动生效。
   (cnfonts-enable)
   ;; 让 spacemacs mode-line 中的 Unicode 图标正确显示。
   (cnfonts-set-spacemacs-fallback-fonts)
+  
   (define-key evil-insert-state-map (kbd "C-y") #'yank)
   (define-key evil-insert-state-map (kbd "M-w") #'kill-ring-save)
   (define-key evil-insert-state-map (kbd "\C-a") 'evil-first-non-blank)
@@ -555,6 +556,7 @@ dump."
   (add-hook 'dired-mode-hook 'org-download-enable)
   (org-download-enable)
   (setq custom-file (expand-file-name "custom.el" dotspacemacs-directory))
+  (setq powerline-default-separator 'slant)
   (load custom-file 'no-error 'no-message)
   "Configuration for user code:
 This function is called at the very end of Spacemacs startup, after layer
@@ -579,7 +581,7 @@ This function is called at the very end of Spacemacs initialization."
    '("990e24b406787568c592db2b853aa65ecc2dcd08146c0d22293259d400174e37" "71e5acf6053215f553036482f3340a5445aee364fb2e292c70d9175fb0cc8af7" default))
  '(evil-want-Y-yank-to-eol nil)
  '(package-selected-packages
-   '(ivy-posframe liberime rime web-beautify tide typescript-mode prettier-js nodejs-repl lsp-ui lsp-treemacs lsp-origami origami lsp-ivy lsp-mode dash-functional json-navigator hierarchy json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc emojify emoji-cheat-sheet-plus helm helm-core company-emoji doom-themes yasnippet-snippets ws-butler writeroom-mode winum which-key wgrep volatile-highlights vi-tilde-fringe uuidgen use-package unfill undo-tree treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil toc-org symon symbol-overlay string-inflection spaceline-all-the-icons smex smeargle restart-emacs request rainbow-delimiters popwin pcre2el password-generator paradox overseer orgit org-superstar org-rich-yank org-projectile org-present org-pomodoro org-mime org-cliplink org-brain open-junk-file nameless mwim move-text magit-svn magit-section magit-gitflow macrostep lorem-ipsum link-hint ivy-yasnippet ivy-xref ivy-purpose ivy-hydra ivy-avy indent-guide hybrid-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-make google-translate golden-ratio gnuplot gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link fuzzy forge font-lock+ flyspell-correct-ivy flycheck-pos-tip flycheck-package flycheck-elsa flx-ido fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-easymotion evil-cleverparens evil-args evil-anzu eval-sexp-fu emr elisp-slime-nav editorconfig dumb-jump dotenv-mode dired-quick-sort diminish devdocs define-word counsel-projectile company column-enforce-mode clean-aindent-mode centered-cursor-mode auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent ace-link ac-ispell)))
+   '(ivy-posframe liberime rime web-beautify tide typescript-mode prettier-js nodejs-repl lsp-ui lsp-treemacs lsp-origami origami lsp-ivy lsp-mode dash-functional json-navigator hierarchy json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc emojify emoji-cheat-sheet-plus helm helm-core company-emoji doom-themes yasnippet-snippets ws-butler writeroom-mode winum which-key wgrep volatile-highlights vi-tilde-fringe uuidgen use-package unfill undo-tree treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil toc-org symon symbol-overlay string-inflection spaceline-all-the-icons smex smeargle restart-emacs request rainbow-delimiters popwin pcre2el password-generator paradox overseer orgit org-superstar org-rich-yank org-projectile org-present org-pomodoro org-mime org-cliplink org-brain open-junk-file nameless mwim move-text magit-svn magit-section magit-gitflow macrostep lorem-ipsum link-hint ivy-yasnippet ivy-xref ivy-purpose ivy-hydra ivy-avy indent-guide hybrid-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-make google-translate golden-ratio gnuplot gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link fuzzy forge font-lock+ flyspell-correct-ivy flycheck-pos-tip flycheck-package flycheck-elsa flx-ido fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-easymotion evil-cleverparens evil-args evil-anzu eval-sexp-fu emr elisp-slime-nav editorconfig dumb-jump dotenv-mode dired-quick-sort diminish devdocs define-word counsel-projectile column-enforce-mode clean-aindent-mode centered-cursor-mode auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent ace-link ac-ispell)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
